@@ -32,6 +32,8 @@ def Cut_audio(folder): #Cut a big audio to do speech recognition
     end_miliseconds = 45000
     i = 1
     song = au.from_mp3(PATH) #Open the audio file, which have been trimmed
+    if(end_miliseconds>(song.duration_seconds*1000)):
+        end_miliseconds = song.duration_seconds*1000
     test = 0
     while(end_miliseconds<=(song.duration_seconds*1000) and test<2): #Trim all audio in each 45 seconds
         extract = song[begin_miliseconds:end_miliseconds]
