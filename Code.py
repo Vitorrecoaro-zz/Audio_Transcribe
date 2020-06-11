@@ -1,8 +1,9 @@
 # Função do Código: Receber um audio mp3 como parâmetro para fazer a transcrição do audio
 # Criador: Vitor de Almeida Recoaro.
-# Versão: 1.1
+# Versão: 1.2
 # Data: 10/06/2020.
-#Novas funcionalidades: 1.1 - Delete all the "temporaly" files and folders
+#Novas funcionalidades: 1.1 - Delete all the "temporaly" files and folders.
+#1.2 - Save a ".txt" file, with the transcribed audio.
 
 import speech_recognition as sr
 import sys as sy
@@ -16,17 +17,20 @@ def Clean_prompt(osname): #Clear the prompt screen
     elif(osname=="Windows"):
         os.system("cls")
 
-def Transcribe_Audio(AUDIO_FILE): #Recive the audio file, to do the speech recognition
+def Transcribe_Audio(AUDIO_FILE,filepath): #Recive the audio file, to do the speech recognition
     r = sr.Recognizer()
+    txt_file = open((filepath+".txt"),"a+")
     with sr.AudioFile(AUDIO_FILE) as source:
+        r.adjust_for_ambient_noise(source)
         audio = r.record(source)
     try: 
-        print(r.recognize_google(audio,language='pt-BR')) #If you want to change the language, view all parameters in this url : https://cloud.google.com/speech-to-text/docs/languages
+        txt_file.write(r.recognize_google(audio,language='pt-BR')) #If you want to change the language, view all parameters in this url : https://cloud.google.com/speech-to-text/docs/languages
+        txt_file.close()
     except sr.UnknownValueError:
         print("We can't understand the audio!")
 
-def Cut_audio(folder): #Cut a big audio to do speech recognition
-    if (os.path.isdir(folder==False)):
+def Cut_audio(folder,PATH): #Cut a big audio to do speech recognition
+    if (os.path.isdir(folder)==False):
         os.mkdir(folder)  #Create a folder for all audio cuts in the same folder of audio.
     begin_miliseconds = 0
     end_miliseconds = 45000
@@ -48,39 +52,40 @@ def Cut_audio(folder): #Cut a big audio to do speech recognition
             end_miliseconds = song.duration_seconds*1000
             test += 1
 
-if(len(sy.argv)==2):
-    PATH = sy.argv[1]
+PATH = input("Place here the mp3 audio path:\n")
+if(os.path.isfile(PATH)==True):
     osname = os.uname()
     if(str(osname[0])=="Linux"):
         last_bar = PATH.rfind("/")
-        just_folder = PATH[:last_bar]
+        folder = PATH[:last_bar]
     elif(str(osname[0])=="Windows"):
         last_bar = PATH.rfind("\\")
-        just_folder = PATH[:last_bar]
+        folder = PATH[:last_bar]
     last_point = PATH.rfind(".")
     filename = PATH[last_bar:last_point]
-    folder = just_folder + filename
-    Cut_audio(folder)
+    folder = folder + filename
+    Cut_audio(folder,PATH)
     trimmedAudios = 1
     if(str(osname[0])=="Linux"):
-        while(os.path.isfile(folder+"/Cut"+str(trimmedAudios)+".wav"==True)):
-            Transcribe_Audio((folder+"/Cut"+str(trimmedAudios)+".wav"))
+        while((os.path.isfile(folder+"/Cut"+str(trimmedAudios)+".wav"))==True):
+            Transcribe_Audio((folder+"/Cut"+str(trimmedAudios)+".wav"),folder)
             trimmedAudios += 1
     elif(str(osname[0])=="Windows"):
         while(os.path.isfile(folder+"\\Cut"+str(trimmedAudios)+".wav"==True)):
-            Transcribe_Audio((folder+"\\Cut"+str(trimmedAudios)+".wav"))
+            Transcribe_Audio((folder+"\\Cut"+str(trimmedAudios)+".wav"),folder)
             trimmedAudios += 1
     i = 1        
-    while(i<=trimmedAudios):
+    while(i<trimmedAudios):
         if(str(osname[0])=="Linux"):
             os.remove(folder+"/Cut"+str(i)+".wav")
         elif(str(osname[0])=="Windows"):
             os.remove(folder+"\\Cut"+str(i)+".wav")
+        i += 1
     if(str(osname[0])=="Linux"):
-        os.rmdir(just_folder)
+        os.rmdir(folder)
     elif(str(osname[0])=="Windows"):
-        os.rmdir(just_folder)
+        os.rmdir(folder)
 else:
-        input("Invalid argments\nPress ENTER to continue.")
+        input("I can't find the file.\nPress ENTER to continue.")
         Clean_prompt(os.uname())
 
