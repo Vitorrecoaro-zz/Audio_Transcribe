@@ -41,10 +41,7 @@ def Cut_audio(folder,PATH): #Cut a big audio to do speech recognition
     test = 0
     while(end_miliseconds<=(song.duration_seconds*1000) and test<2): #Trim all audio in each 45 seconds
         extract = song[begin_miliseconds:end_miliseconds]
-        if(str(osname[0])=="Linux"):
-            extract.export(folder+"/Cut"+str(i)+".wav", format = "wav")
-        elif(str(osname[0])=="Windows"):
-            extract.export(folder+"\\Cut"+str(i)+".wav", format = "wav") 
+        extract.export(folder+"/Cut"+str(i)+".wav", format = "wav") 
         i += 1
         begin_miliseconds += 45000
         end_miliseconds += 45000
@@ -55,36 +52,21 @@ def Cut_audio(folder,PATH): #Cut a big audio to do speech recognition
 PATH = input("Place here the mp3 audio path:\n")
 if(os.path.isfile(PATH)==True):
     osname = os.uname()
-    if(str(osname[0])=="Linux"):
-        last_bar = PATH.rfind("/")
-        folder = PATH[:last_bar]
-    elif(str(osname[0])=="Windows"):
-        last_bar = PATH.rfind("\\")
-        folder = PATH[:last_bar]
+    last_bar = PATH.rfind("/")
+    folder = PATH[:last_bar]
     last_point = PATH.rfind(".")
     filename = PATH[last_bar:last_point]
     folder = folder + filename
     Cut_audio(folder,PATH)
     trimmedAudios = 1
-    if(str(osname[0])=="Linux"):
-        while((os.path.isfile(folder+"/Cut"+str(trimmedAudios)+".wav"))==True):
-            Transcribe_Audio((folder+"/Cut"+str(trimmedAudios)+".wav"),folder)
-            trimmedAudios += 1
-    elif(str(osname[0])=="Windows"):
-        while(os.path.isfile(folder+"\\Cut"+str(trimmedAudios)+".wav"==True)):
-            Transcribe_Audio((folder+"\\Cut"+str(trimmedAudios)+".wav"),folder)
-            trimmedAudios += 1
+    while((os.path.isfile(folder+"/Cut"+str(trimmedAudios)+".wav"))==True):
+        Transcribe_Audio((folder+"/Cut"+str(trimmedAudios)+".wav"),folder)
+        trimmedAudios += 1
     i = 1        
     while(i<trimmedAudios):
-        if(str(osname[0])=="Linux"):
-            os.remove(folder+"/Cut"+str(i)+".wav")
-        elif(str(osname[0])=="Windows"):
-            os.remove(folder+"\\Cut"+str(i)+".wav")
+        os.remove(folder+"/Cut"+str(i)+".wav")
         i += 1
-    if(str(osname[0])=="Linux"):
-        os.rmdir(folder)
-    elif(str(osname[0])=="Windows"):
-        os.rmdir(folder)
+    os.rmdir(folder)
 else:
         input("I can't find the file.\nPress ENTER to continue.")
         Clean_prompt(os.uname())
