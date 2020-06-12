@@ -1,9 +1,10 @@
 # Função do Código: Receber um audio mp3 como parâmetro para fazer a transcrição do audio
 # Criador: Vitor de Almeida Recoaro.
-# Versão: 1.2
+# Versão: 1.3
 # Data: 10/06/2020.
-#Novas funcionalidades: 1.1 - Delete all the "temporaly" files and folders.
-#1.2 - Save a ".txt" file, with the transcribed audio.
+# Novas funcionalidades: 1.1 - Delete all the "temporaly" files and folders.
+# 1.2 - Save a ".txt" file, with the transcribed audio.
+# 1.3 - How much files do you want to transcribe? You can do this just running this program once.
 
 import speech_recognition as sr
 import sys as sy
@@ -48,26 +49,31 @@ def Cut_audio(folder,PATH): #Cut a big audio to do speech recognition
         if(end_miliseconds>(song.duration_seconds*1000)):
             end_miliseconds = song.duration_seconds*1000
             test += 1
-
-PATH = input("Place here the mp3 audio path:\n")
-if(os.path.isfile(PATH)==True):
-    osname = os.uname()
-    last_bar = PATH.rfind("/")
-    folder = PATH[:last_bar]
-    last_point = PATH.rfind(".")
-    filename = PATH[last_bar:last_point]
-    folder = folder + filename
-    Cut_audio(folder,PATH)
-    trimmedAudios = 1
-    while((os.path.isfile(folder+"/Cut"+str(trimmedAudios)+".wav"))==True):
-        Transcribe_Audio((folder+"/Cut"+str(trimmedAudios)+".wav"),folder)
-        trimmedAudios += 1
-    i = 1        
-    while(i<trimmedAudios):
-        os.remove(folder+"/Cut"+str(i)+".wav")
-        i += 1
-    os.rmdir(folder)
-else:
-        input("I can't find the file.\nPress ENTER to continue.")
-        Clean_prompt(os.uname())
+another = 'Y'
+while(another=='Y' or another=='y'):
+    PATH = input("Place here the mp3 audio path:\n")
+    if(os.path.isfile(PATH)==True):
+        print("Processing...\nJust wait =D.")
+        osname = os.uname()
+        last_bar = PATH.rfind("/")
+        folder = PATH[:last_bar]
+        last_point = PATH.rfind(".")
+        filename = PATH[last_bar:last_point]
+        folder = folder + filename
+        Cut_audio(folder,PATH)
+        trimmedAudios = 1
+        while((os.path.isfile(folder+"/Cut"+str(trimmedAudios)+".wav"))==True):
+            Transcribe_Audio((folder+"/Cut"+str(trimmedAudios)+".wav"),folder)
+            trimmedAudios += 1
+        i = 1        
+        while(i<trimmedAudios):
+            os.remove(folder+"/Cut"+str(i)+".wav")
+            i += 1
+        os.rmdir(folder)
+    else:
+            input("I can't find the file.\nPress ENTER to continue.")
+            Clean_prompt(os.uname())
+    another = input("Want to do in another audio (Y/N) ?\nAnwser: ")
+    while(another!='Y' and another!='y' and another!='N' and another!='n'):
+        another = input("This anwser is not valid.\nChoose (Y/N): ")
 
