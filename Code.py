@@ -61,7 +61,7 @@ another = 'Y'
 while(another=='Y' or another=='y'):
     number_files = int(input("How much files do you want to do:\n"))
     while(number_files<=0):
-        number_files = input("Enter a valid number: \n")
+        number_files = int(input("Enter a valid number: \n"))
     aux = 0
     PATH = [] # Create an array to save all files path.
     while(aux<number_files):
